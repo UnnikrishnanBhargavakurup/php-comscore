@@ -150,7 +150,7 @@ Class ComscoreAPI {
       return $result->SubmitReportResult;
     }
   }
-  
+
   /**
    * For fetching report from comScore.
    * 
@@ -164,6 +164,22 @@ Class ComscoreAPI {
     $result = $this->soap_client->__soapCall("FetchReport", array($data));
     if(!empty($result)) {
       return $result->FetchReportResult;
+    }
+  }
+  
+  /**
+   * For checking the job status in comScore.
+   * 
+   * @param $jobid
+   *   jobid for which status need to checked.
+   */
+  public function ping_job_status($jobid) {
+    $data = [
+      'jobId' => $jobid,
+    ];
+    $result = $this->soap_client->__soapCall("PingReportStatus", array($data));
+    if(!empty($result)) {
+      return $result->PingReportStatusResult->Status;
     }
   }
 }

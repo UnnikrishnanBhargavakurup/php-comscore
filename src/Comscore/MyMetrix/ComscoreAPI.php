@@ -15,6 +15,9 @@ Class ComscoreAPI {
   
   private $soap_client;
   
+  //Total Population Based
+  private $rfCensusOption = 1;
+  private $rfReachOption = 1;  
   /**
    * For getting a singleton instance of comScore.
    *
@@ -67,7 +70,7 @@ Class ComscoreAPI {
     }
     return null;
   }
-  
+
   /**
    * For finding all the media available in a geographical area.
    * 
@@ -98,6 +101,53 @@ Class ComscoreAPI {
     $result = $this->soap_client->__soapCall("FetchMedia", array($data));
     if(!empty($result)) {
       return $result->FetchMediaResult->MediaItem;
+    }
+  }
+
+  /**
+   * For finding media metrix.
+   * 
+   * @param $media
+   *  media array for which we need to find metrics
+   * @param $params
+   *  different dependency parameter for finding media report
+   */
+  public function submit_report($media, $params = []) {
+    $data = [
+      'query' => array(
+        'Parameter' => array(
+          // geography
+          array('KeyId' => 'geo',  'Value' => $params['geo']), 
+          // for all locations.
+          array('KeyId' => 'loc',  'Value' => $params['loc']), 
+          array('KeyId' => 'timePeriod',  'Value' => $params['timePeriod']), 
+          array('KeyId' => 'targetGroup',  'Value' => $params['targetGroup']), 
+          array('KeyId' => 'targetType',  'Value' => $params['targetType']), 
+          array('KeyId' => 'rfCensusOption',  'Value' => $this->rfCensusOption),
+          array('KeyId' => 'rfReachOption',  'Value' => $this->rfReachOption),
+        ),
+        'RFInput' => array(),
+      )
+    ];
+    foreach($media as $medium) {
+      $data['query']['Parameter'][] = array(
+        'KeyId' => 'media',  
+        'Value' => $medium['comscore_id'],
+      );
+      $data['query']['RFInput'][] = array(
+        "MediaId" => $medium['comscore_id'],
+        "TargetId" => $this->target_Id, 
+        "Duration" => $medium['duration'],
+        "Impressions" => $medium['impressions'],
+        "FrequencyCap" => $medium['frequency_cap'], 
+        "ReachFactor" => $medium['reach_factor'], 
+        "CPM" => $medium['cpm'],
+      );
+    }
+    $data['query']['Parameter'][] = array('KeyId' => 'target', 'Value' => $params['ageGroup']);
+    $result = $this->soap_client->__soapCall("SubmitReport", array($data));
+    if(!empty($result)) {
+      return $result->SubmitReportResult;
     }
   }
 }

@@ -67,4 +67,37 @@ Class ComscoreAPI {
     }
     return null;
   }
+  
+  /**
+   * For finding all the media available in a geographical area.
+   * 
+   * @param $criteria
+   *  search criteria for the media name
+   */
+  public function fetch_media($criteria, $params = []) {
+    $data = [
+      'parameterId' => 'media',
+      'fetchMediaQuery' => array(
+       'xmlns' => 'http://comscore.com/FetchMedia',
+       'SearchCritera' => array(
+          array('Critera' => 'Platform'),
+          array('Critera' => 'Advertising'),
+          array("ExactMatch" => false, 'Critera' => $criteria),
+        ),
+      ),
+      'reportQuery' => array(
+        'xmlns' => 'http://comscore.com/FetchMedia',
+        'Parameter' => array(
+          array('KeyId' => 'geo',  'Value' => $params['geo']), 
+          array('KeyId' => 'timeType',  'Value' => $params['timeType']),
+          array('KeyId' => 'timePeriod',  'Value' => $params['timePeriod']),
+          array('KeyId' => 'mediaSetType',  'Value' => $params['mediaSetType']),
+        ),
+      )    
+    ];
+    $result = $this->soap_client->__soapCall("FetchMedia", array($data));
+    if(!empty($result)) {
+      return $result->FetchMediaResult->MediaItem;
+    }
+  }
 }

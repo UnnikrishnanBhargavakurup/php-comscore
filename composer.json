@@ -2,7 +2,6 @@
     "name": "comscore/php-comscore",
     "description": "PHP implementation for comScore's Web API integration",
     "require": {
-        "artisaninweb/laravel-soap": "dev-master"
     },
     "license": "GPL-3.0+",
     "authors": [

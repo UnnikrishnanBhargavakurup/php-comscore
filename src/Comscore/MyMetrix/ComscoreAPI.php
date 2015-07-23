@@ -14,7 +14,7 @@ use SoapClient;
 Class ComscoreAPI {
   
   private $soap_client;
-  
+
   //Total Population Based
   private $rfCensusOption = 1;
   private $rfReachOption = 1;  
@@ -148,6 +148,22 @@ Class ComscoreAPI {
     $result = $this->soap_client->__soapCall("SubmitReport", array($data));
     if(!empty($result)) {
       return $result->SubmitReportResult;
+    }
+  }
+  
+  /**
+   * For fetching report from comScore.
+   * 
+   * @param $jobid
+   *  jobid for which report need to be fetched.
+   */
+  public function fetch_report($jobid) {
+    $data = [
+      'jobId' => $jobid,
+    ];
+    $result = $this->soap_client->__soapCall("FetchReport", array($data));
+    if(!empty($result)) {
+      return $result->FetchReportResult;
     }
   }
 }
